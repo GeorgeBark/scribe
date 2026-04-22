@@ -38,6 +38,7 @@ from .const import (
     CONF_EXCLUDE_DOMAINS, CONF_EXCLUDE_ENTITIES, CONF_EXCLUDE_ENTITY_GLOBS,
     CONF_EXCLUDE_ATTRIBUTES,
     CONF_INCLUDE_EVENTS,
+    DEFAULT_EVENT_TYPES,
     CONF_ENABLE_STATS_IO, DEFAULT_ENABLE_STATS_IO,
     CONF_ENABLE_STATS_CHUNK, DEFAULT_ENABLE_STATS_CHUNK,
     CONF_ENABLE_STATS_SIZE, DEFAULT_ENABLE_STATS_SIZE,
@@ -76,10 +77,21 @@ def _multi_text_selector() -> selector.SelectSelector:
     ))
 
 
-def _domain_selector(hass) -> selector.SelectSelector:
+def _domain_selector(hass: "HomeAssistant") -> selector.SelectSelector:
     """Domain selector built from domains currently present in the HA instance."""
     domains = sorted({state.domain for state in hass.states.async_all()})
     options = [{"value": d, "label": d} for d in domains]
+    return selector.SelectSelector(selector.SelectSelectorConfig(
+        options=options, multiple=True, custom_value=True,
+        mode=selector.SelectSelectorMode.LIST,
+    ))
+
+
+def _event_type_selector(hass: "HomeAssistant") -> selector.SelectSelector:
+    """Event type selector pre-populated with well-known and currently active events."""
+    active = set(hass.bus.async_listeners().keys())
+    combined = sorted(active | set(DEFAULT_EVENT_TYPES))
+    options = [{"value": e, "label": e} for e in combined]
     return selector.SelectSelector(selector.SelectSelectorConfig(
         options=options, multiple=True, custom_value=True,
         mode=selector.SelectSelectorMode.LIST,
@@ -212,7 +224,7 @@ class ScribeOptionsFlowHandler(config_entries.OptionsFlow):
             vol.Optional(CONF_EXCLUDE_ATTRIBUTES, default=g(CONF_EXCLUDE_ATTRIBUTES, [])):
                 _multi_text_selector(),
             vol.Optional(CONF_INCLUDE_EVENTS, default=g(CONF_INCLUDE_EVENTS, [])):
-                _multi_text_selector(),
+                _event_type_selector(self.hass),
         })
 
     # ------------------------------------------------------------------

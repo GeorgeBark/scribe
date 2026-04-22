@@ -74,3 +74,28 @@ CONF_ENABLE_USERS = "enable_table_users"
 DEFAULT_ENABLE_USERS = True
 
 CONF_INCLUDE_EVENTS = "include_events"
+
+# Well-known Home Assistant event types offered as default choices in the UI.
+DEFAULT_EVENT_TYPES = [
+    "automation_triggered",
+    "call_service",
+    "component_loaded",
+    "device_registry_updated",
+    "entity_registry_updated",
+    "area_registry_updated",
+    "homeassistant_start",
+    "homeassistant_started",
+    "homeassistant_stop",
+    "homeassistant_final_write",
+    "logbook_entry",
+    "mobile_app_notification_action",
+    "scene_activated",
+    "script_started",
+    "service_registered",
+    "service_removed",
+    "state_changed",
+    "tag_scanned",
+    "timer_cancelled",
+    "timer_finished",
+    "timer_started",
+]
